@@ -1,16 +1,31 @@
 import React, { Component } from 'react';
-// import { Link } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import * as actions from '../actions'
+
+import Header from './Header';
+import Landing from './Landing';
+const Survey = () => <h2>Survey Page</h2>
+
 
 class App extends Component {
+    componentDidMount(){
+        this.props.fetchUser()
+    }
     render(){
         return (
-            <div>
-                <h3 className='text-center text-info'>This is my first react Application</h3>
-                
-            </div>
+            <BrowserRouter>
+                <div className="container">
+                    <Header />
+                    <Switch>
+                        <Route path='/surveys' component={Survey} />
+                        <Route path='/' component={Landing} />
+                    </Switch>
+                </div>
+            </BrowserRouter>
         )
     }
 }
 
 
-export default App;
+export default connect(null, actions)(App);
