@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import Payment from './Payment'; 
+
 class Header extends Component {
     renderContent(){
         switch(this.props.auth){
             case null:
                 return;
             case false:
-                return <a href="/auth/google">Login With Google</a>
+                return <li><a href="/auth/google">Login With Google</a></li>
             default:
-                return <a href="/api/logout">Logout</a>;
+                return [
+                    <li key='1'><Payment /></li>,
+                    <li key="3" style={{ margin: "0 10px"}}>
+                        Credits: {this.props.auth.credits}
+                    </li>,
+                    <li key='2'><a href="/api/logout">Logout</a></li>
+                ]
         }
     }
     render(){
@@ -22,9 +30,7 @@ class Header extends Component {
                         NODDY
                     </Link>
                     <ul className="right">
-                        <li>
-                            { this.renderContent()}
-                        </li>
+                        { this.renderContent()}
                     </ul>
                </div>
             </nav>
