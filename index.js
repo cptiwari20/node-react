@@ -4,14 +4,17 @@ const passport = require('passport');
 const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser')
 
-const keys = require('./config/keys')
-
-require('./models/User')
+// requiring some addition files
+require('./models/User');
+require('./models/Survey');
 require('./services/passport');
 
-mongoose.connect(keys.mongoURI);
+const keys = require('./config/keys')
+
+// Middlewares
+mongoose.connect(keys.mongoURI, { useNewUrlParser: true });
 const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 app.use( 
     cookieSession({
@@ -22,9 +25,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Routes
 require('./routes/authRoutes')(app);
 require('./routes/paymentRoutes')(app);
+require('./routes/surveyRoutes')(app);
 
+
+// Production routes
 if(process.env.NODE_ENV === 'production'){
     app.use(express.static('client/build'));
     const path = require('path');
@@ -33,6 +40,7 @@ if(process.env.NODE_ENV === 'production'){
     })
 };
 
+// Hosting port
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Server has been start on Port: ${port}`);
