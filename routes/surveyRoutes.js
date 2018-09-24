@@ -1,3 +1,5 @@
+const { URL } = require('url');
+const Path = require('path-parser')
 const mongoose = require('mongoose')
 const requiresLogin = require('../middlewares/requiresLogin');
 const requiresCredits = require('../middlewares/requiresCredits');
@@ -8,12 +10,18 @@ const Survey = mongoose.model('surveys')
 
 module.exports = app => {
 
-    app.get('/api/surveys/:surveyId/:ans', (req, res) => {
+    app.get('/api/surveys/:surveyId/:choice', (req, res) => {
         res.send('Thanks for your feedback!')
     });
     app.post('/api/surveys/webhooks', (req, res) =>{
-        console.log(req.body);
-        res.send({})
+        const data = req.body;
+        const events = data.map(({ url, email}) => {
+            const pathname = new URL(url).pathname;
+            const p = new Path('/api/surveys/:surveyId/:choice');
+            const match = p.test(pathname);
+            console.log(match);
+            
+        })
     })
 
     app.post('/api/surveys', requiresLogin, requiresCredits, async (req, res) => {
