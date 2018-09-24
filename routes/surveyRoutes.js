@@ -16,19 +16,21 @@ module.exports = app => {
     });
     app.post('/api/surveys/webhooks', (req, res) =>{
         const data = req.body;
-        const events = data.map(({ url, email}) => {
-            const pathname = new URL(url).pathname;
-            const p = new Path('/api/surveys/:surveyId/:choice');
-            const match = p.test(pathname);
-            if(match){
-                return { email, surveyId: match.surveyId, choice: match.choice};
-            };
-        });
-        const compactEvents = _.compact(events); // removes undefined or null
-        const uniqueEvents = _.uniqBy(compactEvents, 'surveyId', 'email');
+        const p = new Path('/api/surveys/:surveyId/:choice');
+
+        const events = _.chain(data)
+            .map(({ url, email}) => {
+                const match = p.test(new URL(url).pathname);
+                if(match){
+                    return { email, surveyId: match.surveyId, choice: match.choice};
+                };
+            })
+            .compact()
+            .uniqBy('surveyId', 'email')
+            .value();
 
 
-        console.log(uniqueEvents);
+        console.log(events);
         console.log('This is it ***************')
 
         res.send({})
