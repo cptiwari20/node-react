@@ -18,7 +18,7 @@ module.exports = app => {
         const data = req.body;
         const p = new Path('/api/surveys/:surveyId/:choice');
 
-        const events = _.chain(data)
+        _.chain(data)
             .map(({ url, email}) => {
                 const match = p.test(new URL(url).pathname);
                 if(match){
@@ -27,11 +27,19 @@ module.exports = app => {
             })
             .compact()
             .uniqBy('surveyId', 'email')
+            .each(({ surveyId, email, choice }) => {
+                Survey.updateOne(
+                {
+                    _id: surveyId,
+                    recipients: {
+                        $elemMatch : { email: email, responded: false}
+                }
+                }, {
+                    $inc: { [choice]: 1},
+                    $set: { 'recipients.$.responded': true }
+                }).exec();
+            })
             .value();
-
-
-        console.log(events);
-        console.log('This is it ***************')
 
         res.send({})
     })
